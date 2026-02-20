@@ -1,5 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import mongoose, { HydratedDocument } from 'mongoose'
+import { Note } from 'src/notes/notes.model'
+import { MongoType } from '../utils/types/mongo-type'
 
 export type UserDocument = HydratedDocument<User>
 
@@ -15,6 +17,9 @@ export class User {
 
 	@Prop({ select: false })
 	password: string
+
+	@Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Note' }] })
+	notes: Array<MongoType | Note>
 }
 
 export const UserSchema = SchemaFactory.createForClass(User)

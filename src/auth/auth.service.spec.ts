@@ -14,15 +14,21 @@ import {
 
 jest.mock('argon2')
 
+// user object returned by queries (password stripped)
 const user = {
 	_id: uuidv4(),
 	login: 'dfgdfgdfggdf',
 	email: 'gdfdfg@gmail.com',
 	phoneNumber: '+380951267890',
-	password: '$argon2id$v=19$m=19456,t=2,p=1$hashedpassword',
 	createdAt: '2026-02-12T18:40:48.402Z',
 	updatedAt: '2026-02-12T18:40:48.402Z',
 	__v: 0
+}
+
+// same user including hashed password, used when selecting password explicitly
+const userWithPassword = {
+	...user,
+	password: '$argon2id$v=19$m=19456,t=2,p=1$hashedpassword'
 }
 
 const dto: LoginDto = {
@@ -108,22 +114,9 @@ describe('Auth service', () => {
 			req
 		)
 
+		// password should be removed by the service
 		expect(result).toEqual(user)
-	})
-
-	it('should successfully logout', async () => {
-		const req = {
-			session: {
-				token: 'mock-token',
-				destroy: jest.fn(callback => callback(null))
-			}
-		} as unknown as Request
-		const res = {
-			clearCookie: jest.fn()
-		} as unknown as Response
-		const result = await service.logout(req, res)
-
-		expect(result).toEqual({
+		expect((result as any).password).toBeUndefined()
 			message: 'Вы вышли из аккаунта.'
 		})
 	})

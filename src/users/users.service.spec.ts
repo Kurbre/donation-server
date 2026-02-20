@@ -17,8 +17,6 @@ const user = {
 	_id: uuidv4(),
 	login: 'dfgdfgdfggdf',
 	email: 'gdfdfg@gmail.com',
-	phoneNumber: '+380951267890',
-	password: '$argon2id$v=19$m=19456,t=2,p=1$hashedpassword',
 	createdAt: '2026-02-12T18:40:48.402Z',
 	updatedAt: '2026-02-12T18:40:48.402Z',
 	__v: 0
@@ -27,8 +25,7 @@ const user = {
 const dto: CreateUserDto = {
 	login: user.email,
 	password: 'test123',
-	email: user.email,
-	phoneNumber: user.phoneNumber
+	email: user.email
 }
 
 describe('UsersService', () => {
@@ -73,11 +70,7 @@ describe('UsersService', () => {
 		const result = await service.findUser(user.email)
 
 		expect(model.findOne).toHaveBeenCalledWith({
-			$or: [
-				{ email: user.email },
-				{ login: user.email },
-				{ phoneNumber: user.email }
-			]
+			$or: [{ email: user.email }, { login: user.email }]
 		})
 		expect(result).toEqual(user)
 	})
@@ -107,11 +100,7 @@ describe('UsersService', () => {
 		const result = await service.findUserSelectedPassword(user.email)
 
 		expect(model.findOne).toHaveBeenCalledWith({
-			$or: [
-				{ email: user.email },
-				{ login: user.email },
-				{ phoneNumber: user.email }
-			]
+			$or: [{ email: user.email }, { login: user.email }]
 		})
 		// Проверяем, что select('password') был вызван
 		const query = (model.findOne as any).mock.results[0].value
@@ -199,11 +188,7 @@ describe('UsersService', () => {
 		const result = await service.create(dto)
 
 		expect(model.findOne).toHaveBeenCalledWith({
-			$or: [
-				{ email: dto.email },
-				{ login: dto.login },
-				{ phoneNumber: dto.phoneNumber }
-			]
+			$or: [{ email: dto.email }, { login: dto.login }]
 		})
 		expect(hash).toHaveBeenCalledWith(dto.password)
 

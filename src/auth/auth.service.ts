@@ -35,13 +35,19 @@ export class AuthService {
 	}
 
 	async register(dto: CreateUserDto, req: Request) {
+		// create returns a mongoose document that includes the hashed password.
 		const user = await this.usersService.create(dto)
 
 		const token = await this.generateJwtToken(user.id)
-
 		await this.saveSession(req, token)
 
-		return user
+		// strip password before sending data back to caller
+		// `toObject` is safe because the returned value is a hydrated document
+		const result = user.toObject ? user.toObject() : { ...user }
+		if ('password' in result) {
+			delete result.password
+		}
+		return result
 	}
 
 	logout(req: Request, res: Response): Promise<{ message: string }> {
