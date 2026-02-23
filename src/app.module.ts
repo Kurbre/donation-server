@@ -7,6 +7,7 @@ import { JwtModule } from '@nestjs/jwt'
 import { jwtConfig } from './config/jwt.config'
 import { AuthModule } from './auth/auth.module'
 import { NotesModule } from './notes/notes.module'
+import { FoldersModule } from './folders/folders.module';
 
 @Module({
 	imports: [
@@ -27,7 +28,8 @@ import { NotesModule } from './notes/notes.module'
 		}),
 		UsersModule,
 		AuthModule,
-		NotesModule
+		NotesModule,
+		FoldersModule
 	],
 	controllers: [],
 	providers: []

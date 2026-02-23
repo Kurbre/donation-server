@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common'
-import { CreateNoteDto } from './dto/create-note.dto'
 import { UpdateNoteDto } from './dto/update-note.dto'
 import { type MongoType } from 'src/utils/types/mongo-type'
 import { InjectModel } from '@nestjs/mongoose'
@@ -27,6 +26,6 @@ export class NotesService {
 	}
 
 	async update(id: MongoType, dto: UpdateNoteDto) {
-		return await this.noteModel.findByIdAndUpdate(id, dto)
+		return await this.noteModel.findByIdAndUpdate(id, dto, { new: true })
 	}
 }

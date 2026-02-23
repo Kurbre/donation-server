@@ -3,6 +3,9 @@ import { NotesController } from './notes.controller'
 import { NotesService } from './notes.service'
 import { JwtService } from '@nestjs/jwt'
 import { AuthGuard } from '../auth/guards/auth.guard'
+import { getModelToken } from '@nestjs/mongoose'
+import { Note } from './notes.model'
+import { User } from '../users/users.model'
 
 const note = {
 	_id: '69982f8f4f4a39614efdf1ba',
