@@ -1,7 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
-import mongoose, { HydratedDocument } from 'mongoose'
+import mongoose, {
+	HydratedDocument,
+	type Types,
+	type PopulatedDoc
+} from 'mongoose'
 import { User } from '../users/users.model'
-import { MongoType } from '../utils/types/mongo-type'
 import { Note } from 'src/notes/notes.model'
 
 export type FolderDocument = HydratedDocument<Folder>
@@ -17,7 +20,7 @@ export class Folder {
 	order: number
 
 	@Prop({ type: { type: mongoose.Schema.Types.ObjectId, ref: 'User' } })
-	user: User
+	user: PopulatedDoc<User & Types.Subdocument>
 
 	@Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Note' }] })
 	notes: Note[]
