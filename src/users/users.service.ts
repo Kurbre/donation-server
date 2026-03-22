@@ -60,6 +60,22 @@ export class UsersService {
 		return user
 	}
 
+	async findById(id: string) {
+		const user = await this.prismaService.user.findUnique({
+			where: { id }
+		})
+		if (!user) throw new NotFoundException('Пользователь не найден')
+
+		return user
+	}
+	async findByIdNoValidation(id: string) {
+		const user = await this.prismaService.user.findUnique({
+			where: { id }
+		})
+
+		return user
+	}
+
 	async isNotHasUser(email: string) {
 		const user = await this.prismaService.user.findUnique({
 			where: {
@@ -133,5 +149,24 @@ export class UsersService {
 		const template = await this.mailService.getTemplate('resetPassword', data)
 
 		await this.mailService.sendMail(to, 'Сброс пароля', template)
+	}
+
+	async changePassword(userId: string, password: string) {
+		await this.findById(userId)
+
+		const newPassword = await hash(password)
+
+		await this.prismaService.user.update({
+			where: {
+				id: userId
+			},
+			data: {
+				password: newPassword
+			}
+		})
+
+		return {
+			message: 'Пароль успешно изменен'
+		}
 	}
 }
