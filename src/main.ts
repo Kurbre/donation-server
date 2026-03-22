@@ -4,6 +4,7 @@ import session from 'express-session'
 import { ConfigService } from '@nestjs/config'
 import { ValidationPipe } from '@nestjs/common'
 import { Pool } from 'pg'
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 
 const pgSession = require('connect-pg-simple')
 
@@ -42,6 +43,14 @@ async function bootstrap() {
 			})
 		})
 	)
+
+	const docs = new DocumentBuilder()
+		.setTitle('Donation')
+		.setDescription('The donation API description')
+		.setVersion('1.0')
+		.build()
+	const documentFactory = () => SwaggerModule.createDocument(app, docs)
+	SwaggerModule.setup('docs', app, documentFactory)
 
 	await app.listen(config.getOrThrow<string>('APP_PORT') ?? 3000)
 }
