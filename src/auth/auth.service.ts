@@ -13,7 +13,7 @@ import { AuthDto } from './dto/auth.dto'
 import { verify } from 'argon2'
 import { ConfigService } from '@nestjs/config'
 import { MailService } from 'src/mail/mail.service'
-import { ConfirmRegister } from 'src/utils/templates/configRegister.type'
+import { ConfirmRegister } from 'src/utils/templates/confirmRegister.type'
 import { PrismaService } from 'src/prisma/prisma.service'
 
 @Injectable()
