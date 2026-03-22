@@ -26,18 +26,21 @@ model User {
   @@map("users")
 }
 
-model Token {
+model PendingUser {
   id String @id @default(uuid())
 
   token String  @unique @default(uuid())
-  email String
+  name String
+  surname String
 
-  type TokenType
+  email String @unique
+  password String
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+  expiresAt DateTime @default(dbgenerated("(now() + interval '1 minutes')"))
 
-  @@map("tokens")
+  @@map("pending_users")
 }
 
 model Session {
@@ -46,9 +49,4 @@ model Session {
   expire    DateTime @db.Timestamp(6)
 
   @@map("sessions")
-}
-
-enum TokenType {
-  PASSWORD
-  REGISTER
 }

@@ -49,4 +49,16 @@ export class UsersService {
 
 		return user
 	}
+
+	async isNotHasUser(email: string) {
+		const user = await this.prismaService.user.findUnique({
+			where: {
+				email
+			}
+		})
+		if (user)
+			throw new BadRequestException(
+				'Пользователь с таким email уже зарегестрирован'
+			)
+	}
 }

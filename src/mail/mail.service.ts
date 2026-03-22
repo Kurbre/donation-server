@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
+import { type Data, renderFile } from 'ejs'
 import * as nodemailer from 'nodemailer'
+import { join } from 'path'
+import juice from 'juice'
 
 @Injectable()
 export class MailService {
@@ -25,5 +28,18 @@ export class MailService {
 			subject,
 			html
 		})
+	}
+
+	async getTemplate<T extends Data>(templateName: string, data?: T) {
+		const file = join(
+			process.cwd(),
+			'src',
+			'utils',
+			'templates',
+			`${templateName}.ejs`
+		)
+		const template = await renderFile(file, data || {})
+
+		return juice(template)
 	}
 }

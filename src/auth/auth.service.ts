@@ -1,4 +1,5 @@
 import {
+	BadRequestException,
 	Injectable,
 	InternalServerErrorException,
 	UnauthorizedException
@@ -12,6 +13,8 @@ import { AuthDto } from './dto/auth.dto'
 import { verify } from 'argon2'
 import { ConfigService } from '@nestjs/config'
 import { MailService } from 'src/mail/mail.service'
+import { ConfirmRegister } from 'src/utils/templates/configRegister.type'
+import { PrismaService } from 'src/prisma/prisma.service'
 
 @Injectable()
 export class AuthService {
@@ -19,13 +22,53 @@ export class AuthService {
 		private readonly usersService: UsersService,
 		private readonly jwtService: JwtService,
 		private readonly configService: ConfigService,
-		private readonly mailService: MailService
+		private readonly mailService: MailService,
+		private readonly prismaService: PrismaService
 	) {}
 
-	async register(dto: CreateUserDto, req: Request) {
-		const user = await this.usersService.create(dto)
+	async register(dto: CreateUserDto) {
+		await this.usersService.isNotHasUser(dto.email)
+
+		const pendingUser = await this.prismaService.pendingUser.create({
+			data: {
+				...dto
+			}
+		})
+
+		console.log(new Date(), pendingUser.expiresAt)
+
+		await this.sendConfirmEmail(dto.email, {
+			name: dto.name,
+			surname: dto.surname,
+			link: `${this.configService.getOrThrow('CLIENT_URL')}/auth/confirm?token=${pendingUser.token}`
+		})
+	}
+
+	async confirmedRegister(token: string, req: Request) {
+		const pendingUser = await this.prismaService.pendingUser.findUnique({
+			where: {
+				token
+			}
+		})
+		if (!pendingUser) throw new UnauthorizedException('Токен не валидный')
+
+		const now = new Date()
+		if (now > pendingUser.expiresAt) {
+			throw new BadRequestException('Токен просрочен')
+		}
+
+		const user = await this.usersService.create({
+			email: pendingUser.email,
+			name: pendingUser.name,
+			surname: pendingUser.surname,
+			password: pendingUser.password
+		})
 
 		await this.saveSession(req, user)
+
+		await this.prismaService.pendingUser.delete({
+			where: { id: pendingUser.id }
+		})
 
 		return user
 	}
@@ -65,7 +108,14 @@ export class AuthService {
 		})
 	}
 
-	async getTemplate() {}
+	private async sendConfirmEmail(to: string, data: ConfirmRegister) {
+		const template = await this.mailService.getTemplate<ConfirmRegister>(
+			'confirmRegister',
+			data
+		)
+
+		await this.mailService.sendMail(to, 'Подтверждение email', template)
+	}
 
 	private async generateJwtToken(user: Omit<User, 'password'>) {
 		return this.jwtService.signAsync({
