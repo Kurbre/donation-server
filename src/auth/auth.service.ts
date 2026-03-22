@@ -35,13 +35,16 @@ export class AuthService {
 			}
 		})
 
-		console.log(new Date(), pendingUser.expiresAt)
-
 		await this.sendConfirmEmail(dto.email, {
 			name: dto.name,
 			surname: dto.surname,
-			link: `${this.configService.getOrThrow('CLIENT_URL')}/auth/confirm?token=${pendingUser.token}`
+			link: `${this.configService.getOrThrow('CLIENT_URL')}/auth/confirm?token=${pendingUser.token}`,
+			title: 'Подтверждение регистрации'
 		})
+
+		return {
+			message: 'Письмо отправлено'
+		}
 	}
 
 	async confirmedRegister(token: string, req: Request) {
@@ -111,7 +114,9 @@ export class AuthService {
 	private async sendConfirmEmail(to: string, data: ConfirmRegister) {
 		const template = await this.mailService.getTemplate<ConfirmRegister>(
 			'confirmRegister',
-			data
+			{
+				...data
+			}
 		)
 
 		await this.mailService.sendMail(to, 'Подтверждение email', template)

@@ -38,9 +38,22 @@ model PendingUser {
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
-  expiresAt DateTime @default(dbgenerated("(now() + interval '1 minutes')"))
+  expiresAt DateTime @default(dbgenerated("(now() + interval '24 hours')"))
 
   @@map("pending_users")
+}
+
+model Token {
+  id String @id @default(uuid())
+
+  email String @unique
+  type TokenTypes
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  expiresAt DateTime @default(dbgenerated("(now() + interval '24 hours')"))
+
+  @@map("tokens")
 }
 
 model Session {
@@ -49,4 +62,9 @@ model Session {
   expire    DateTime @db.Timestamp(6)
 
   @@map("sessions")
+}
+
+enum TokenTypes {
+  RESET_PASSWORD
+  CHANGE_PASSWORD
 }

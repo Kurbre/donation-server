@@ -30,7 +30,20 @@ export class MailService {
 		})
 	}
 
-	async getTemplate<T extends Data>(templateName: string, data?: T) {
+	async getTemplate<T extends Data & { title: string }>(
+		templateName: string,
+		{ title, ...data }: T
+	) {
+		const basePath = join(process.cwd(), 'src', 'utils', 'templates')
+
+		const templateFile = join(
+			process.cwd(),
+			'src',
+			'utils',
+			'templates',
+			'partials',
+			'layout.ejs'
+		)
 		const file = join(
 			process.cwd(),
 			'src',
@@ -38,7 +51,21 @@ export class MailService {
 			'templates',
 			`${templateName}.ejs`
 		)
-		const template = await renderFile(file, data || {})
+
+		const content = await renderFile(file, data, {
+			views: [basePath]
+		})
+
+		const template = await renderFile(
+			templateFile,
+			{
+				title,
+				content
+			},
+			{
+				views: [basePath] // 👈 ВАЖНО
+			}
+		)
 
 		return juice(template)
 	}

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ru">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title><%= title %></title>
+		<style>
+			/* Базовые сбросы для почтовиков */
+			body {
+				margin: 0;
+				padding: 0;
+				width: 100% !important;
+				-webkit-text-size-adjust: 100%;
+				-ms-text-size-adjust: 100%;
+				background-color: #f4f7f9;
+			}
+			img {
+				border: 0;
+				height: auto;
+				line-height: 100%;
+				outline: none;
+				text-decoration: none;
+			}
+			table {
+				border-collapse: collapse !important;
+			}
+
+			/* Мобильная адаптация */
+			@media screen and (max-width: 600px) {
+				.container {
+					width: 100% !important;
+				}
+				.content {
+					padding: 20px !important;
+				}
+			}
+
+			.body {
+				background-color: #f4f7f9;
+				padding: 20px 0;
+			}
+
+			.container {
+				background-color: #ffffff;
+				border-radius: 12px;
+				overflow: hidden;
+				box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+			}
+
+			.content {
+				padding: 40px;
+				font-family: 'Segoe UI', Arial, sans-serif;
+				color: #333333;
+				line-height: 1.6;
+			}
+		</style>
+	</head>
+	<body>
+		<table width="100%" cellpadding="0" cellspacing="0" border="0" class="body">
+			<tr>
+				<td align="center">
+					<table
+						width="600"
+						cellpadding="0"
+						cellspacing="0"
+						border="0"
+						class="container"
+					>
+						<!-- Header -->
+						<%- include('partials/header') %>
+
+						<!-- Body -->
+						<tr>
+							<td class="content"><%- content %></td>
+						</tr>
+
+						<!-- Footer -->
+						<%- include('partials/footer') %>
+					</table>
+				</td>
+			</tr>
+		</table>
+	</body>
+</html>

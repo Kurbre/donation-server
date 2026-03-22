@@ -1,196 +1,49 @@
-<!DOCTYPE html>
-<html lang="ru">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Подтверждение регистрации</title>
-		<style>
-			/* Базовые сбросы для почтовиков */
-			body {
-				margin: 0;
-				padding: 0;
-				width: 100% !important;
-				-webkit-text-size-adjust: 100%;
-				-ms-text-size-adjust: 100%;
-				background-color: #f4f7f9;
-			}
-			img {
-				border: 0;
-				height: auto;
-				line-height: 100%;
-				outline: none;
-				text-decoration: none;
-			}
-			table {
-				border-collapse: collapse !important;
-			}
+<p style="margin: 0 0 20px 0; font-size: 18px; font-weight: bold">
+	Здравствуйте, <%= name %> <%= surname %>!
+</p>
+<p style="margin: 0 0 20px 0">
+	Мы рады, что вы присоединились к нам. Чтобы начать пользоваться всеми
+	функциями нашего сервиса, пожалуйста, подтвердите ваш адрес электронной почты.
+</p>
 
-			/* Мобильная адаптация */
-			@media screen and (max-width: 600px) {
-				.container {
-					width: 100% !important;
-				}
-				.content {
-					padding: 20px !important;
-				}
-			}
+<table width="100%" cellpadding="0" cellspacing="0" border="0">
+	<tr>
+		<td align="center">
+			<a
+				href="<%= link %>"
+				target="_blank"
+				style="
+					background-color: #46b5e0;
+					color: #ffffff;
+					padding: 10px 25px;
+					text-decoration: none;
+					border-radius: 12px;
+					font-weight: bold;
+					display: inline-block;
+					font-size: 16px;
+					box-shadow: 0 4px 6px rgba(70, 181, 224, 0.3);
+					cursor: pointer;
+				"
+			>
+				Подтвердить E-mail
+			</a>
+		</td>
+	</tr>
+</table>
 
-			.body {
-				background-color: #f4f7f9;
-				padding: 20px 0;
-			}
-
-			.container {
-				background-color: #ffffff;
-				border-radius: 12px;
-				overflow: hidden;
-				box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-			}
-
-			.header {
-				background: #46b5e0;
-				background: linear-gradient(90deg, #46b5e0 0%, #5795c7 100%);
-				padding: 40px 20px;
-			}
-
-			.header__title {
-				margin: 0;
-				font-family: 'Segoe UI', Arial, sans-serif;
-				color: #ffffff;
-				font-size: 24px;
-				font-weight: 600;
-			}
-
-			.header__description {
-				margin: 10px 0 0 0;
-				font-family: 'Segoe UI', Arial, sans-serif;
-				color: #e0f4ff;
-				font-size: 16px;
-			}
-
-			.content {
-				padding: 40px;
-				font-family: 'Segoe UI', Arial, sans-serif;
-				color: #333333;
-				line-height: 1.6;
-			}
-
-			.content__title {
-				margin: 0 0 20px 0;
-				font-size: 18px;
-				font-weight: bold;
-			}
-
-			.content__description {
-				margin: 0 0 20px 0;
-			}
-
-			.content__button {
-				background-color: #46b5e0;
-				color: #ffffff;
-				padding: 10px 25px;
-				text-decoration: none;
-				border-radius: 12px;
-				font-weight: bold;
-				display: inline-block;
-				font-size: 16px;
-				box-shadow: 0 4px 6px rgba(70, 181, 224, 0.3);
-				cursor: pointer;
-			}
-
-			.content__subdescription {
-				margin: 20px 0 0 0;
-				font-size: 14px;
-				color: #777777;
-				text-align: center;
-			}
-
-			.content__subdescription > a {
-				color: #46b5e0;
-				text-decoration: underline;
-			}
-
-			.footer {
-				padding: 30px;
-				background-color: #f9fbfd;
-				border-top: 1px solid #edf2f7;
-				text-align: center;
-				font-family: 'Segoe UI', Arial, sans-serif;
-				color: #a0aec0;
-				font-size: 12px;
-			}
-		</style>
-	</head>
-	<body>
-		<table width="100%" cellpadding="0" cellspacing="0" border="0" class="body">
-			<tr>
-				<td align="center">
-					<table
-						width="600"
-						cellpadding="0"
-						cellspacing="0"
-						border="0"
-						class="container"
-					>
-						<!-- Header -->
-						<tr>
-							<td align="center" class="header">
-								<h1 class="header__title">Добро пожаловать в Donation</h1>
-								<p class="header__description">
-									Подтверждение электронной почты
-								</p>
-							</td>
-						</tr>
-
-						<!-- Body -->
-						<tr>
-							<td class="content">
-								<p class="content__title">
-									Здравствуйте, <%= name %> <%= surname %>!
-								</p>
-								<p class="content__description">
-									Мы рады, что вы присоединились к нам. Чтобы начать
-									пользоваться всеми функциями нашего сервиса, пожалуйста,
-									подтвердите ваш адрес электронной почты.
-								</p>
-
-								<table width="100%" cellpadding="0" cellspacing="0" border="0">
-									<tr>
-										<td align="center">
-											<a
-												href="<%= link %>"
-												target="_blank"
-												class="content__button"
-											>
-												Подтвердить E-mail
-											</a>
-										</td>
-									</tr>
-								</table>
-
-								<p class="content__subdescription">
-									Если кнопка выше не работает, скопируйте и вставьте ссылку в
-									браузер:<br />
-									<a href="<%= link %>" target="_blank"><%= link %></a>
-								</p>
-							</td>
-						</tr>
-
-						<!-- Footer -->
-						<tr>
-							<td class="footer">
-								<p style="margin: 0 0 10px 0">
-									Вы получили это письмо, потому что зарегистрировались на сайте
-									Donation.
-								</p>
-								<p style="margin: 0">
-									© 2026 Donation Inc. Все права защищены.
-								</p>
-							</td>
-						</tr>
-					</table>
-				</td>
-			</tr>
-		</table>
-	</body>
-</html>
+<p
+	style="
+		margin: 20px 0 0 0;
+		font-size: 14px;
+		color: #777777;
+		text-align: center;
+	"
+>
+	Если кнопка выше не работает, скопируйте и вставьте ссылку в браузер:<br />
+	<a
+		href="<%= link %>"
+		target="_blank"
+		style="color: #46b5e0; text-decoration: underline"
+		><%= link %></a
+	>
+</p>
