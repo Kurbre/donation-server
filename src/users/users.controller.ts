@@ -13,9 +13,10 @@ import { ChangePasswordDto } from './dto/change-password.dto'
 import { ResetPasswordDto } from './dto/reset-password.dto'
 import { SendResetPasswordDto } from './dto/send-reset-password.dto'
 import { UserResponseDto } from './dto/user-response.dto'
-import { GetUser } from './users.decorator'
+import { GetUser } from './decorators/users.decorator'
 import { UsersService } from './users.service'
 import { ErrorResponseDto } from 'src/utils/dto/error-response.dto'
+import { ErrorApiResponse } from './decorators/error-api-response.decorator'
 
 @ApiTags('Users')
 @Controller('users')
@@ -53,28 +54,16 @@ export class UsersController {
 		description: 'Пароль успешно изменен на новый',
 		type: MessageResponseDto
 	})
-	@ApiResponse({
-		status: HttpStatus.UNAUTHORIZED,
-		description: 'Не верный токен либо не верный тип токена',
-		schema: {
-			example: {
-				message: 'Токен не валидный',
-				error: 'Unauthorized',
-				statusCode: 401
-			}
-		}
-	})
-	@ApiResponse({
-		status: HttpStatus.BAD_REQUEST,
-		description: 'Просроченный токен',
-		schema: {
-			example: {
-				message: 'Токен просрочен',
-				error: 'Bad Request',
-				statusCode: 400
-			}
-		}
-	})
+	@ErrorApiResponse(
+		HttpStatus.UNAUTHORIZED,
+		'Не верный токен либо не верный тип токена',
+		'Токен не валидный'
+	)
+	@ErrorApiResponse(
+		HttpStatus.BAD_REQUEST,
+		'Просроченный токен',
+		'Токен просрочен'
+	)
 	resetPassword(@Body() dto: ResetPasswordDto) {
 		return this.usersService.resetPassword(dto)
 	}
