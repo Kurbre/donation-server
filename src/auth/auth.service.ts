@@ -116,15 +116,13 @@ export class AuthService {
 
 	async logout(req: Request, res: Response): Promise<{ message: string }> {
 		if (!req.session.token)
-			throw new UnauthorizedException(
-				'Вы не авторизованы, чтобы выйти из аккаунта.'
-			)
+			throw new UnauthorizedException(AUTH_ERRORS.UNAUTHORIZED_LOGOUT)
 
 		await new Promise((resolve, reject) => {
 			req.session.destroy(err => {
 				if (err)
 					return reject(
-						new InternalServerErrorException('Не удалось выйти из аккаунта.')
+						new InternalServerErrorException(AUTH_ERRORS.BAD_LOGOUT)
 					)
 				resolve(true)
 			})
@@ -167,11 +165,7 @@ export class AuthService {
 
 			req.session.save(err => {
 				if (err) {
-					return reject(
-						new InternalServerErrorException(
-							'Не удалось сохранить сессию. Проверьте, правильно ли настроены параметры сесси.'
-						)
-					)
+					return reject(new InternalServerErrorException(AUTH_ERRORS.SESSION))
 				}
 
 				resolve()
