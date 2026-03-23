@@ -13,6 +13,7 @@ import { ResetPassword } from 'src/utils/templates/resetPassword.type'
 import { ConfigService } from '@nestjs/config'
 import { Prisma, TokenTypes } from '@prisma/client'
 import { ResetPasswordDto } from './dto/reset-password.dto'
+import { USERS_ERRORS } from './constants/users-errors'
 
 @Injectable()
 export class UsersService {
@@ -31,10 +32,7 @@ export class UsersService {
 				email: dto.email
 			}
 		})
-		if (isFindedUser)
-			throw new BadRequestException(
-				'Пользователь с таким email уже зарегестрирован'
-			)
+		if (isFindedUser) throw new BadRequestException(USERS_ERRORS.FINDED_USER)
 
 		return await prisma.user.create({
 			data: {
@@ -58,8 +56,7 @@ export class UsersService {
 		const user = await this.prismaService.user.findUnique({
 			where: { email }
 		})
-		if (!user)
-			throw new NotFoundException('Пользователь с таким Email не найден')
+		if (!user) throw new NotFoundException(USERS_ERRORS.NOT_FOUND_EMAIL)
 
 		return user
 	}
@@ -76,7 +73,7 @@ export class UsersService {
 				updatedAt: true
 			}
 		})
-		if (!user) throw new NotFoundException('Пользователь не найден')
+		if (!user) throw new NotFoundException(USERS_ERRORS.NOT_FOUND)
 
 		return user
 	}
@@ -130,11 +127,11 @@ export class UsersService {
 			}
 		})
 		if (!token || token.type !== TokenTypes.RESET_PASSWORD)
-			throw new UnauthorizedException('Токен не валидный')
+			throw new UnauthorizedException(USERS_ERRORS.INVALID_TOKEN)
 
 		const now = new Date()
 		if (now > token.expiresAt) {
-			throw new BadRequestException('Токен просрочен')
+			throw new BadRequestException(USERS_ERRORS.TOKEN_EXPIRED)
 		}
 
 		const newPassword = await hash(password)

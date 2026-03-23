@@ -16,6 +16,7 @@ import { ResetPasswordDto } from './dto/reset-password.dto'
 import { SendResetPasswordDto } from './dto/send-reset-password.dto'
 import { UserResponseDto } from './dto/user-response.dto'
 import { UsersService } from './users.service'
+import { USERS_ERRORS } from './constants/users-errors'
 
 @ApiTags('Users')
 @Controller('users')
@@ -32,8 +33,8 @@ export class UsersController {
 	})
 	@ErrorApiResponse(
 		HttpStatus.NOT_FOUND,
-		'Пользователь не найден',
-		'Пользователь с таким Email не найден'
+		USERS_ERRORS.NOT_FOUND,
+		USERS_ERRORS.NOT_FOUND_EMAIL
 	)
 	sendResetPassword(@Body() dto: SendResetPasswordDto) {
 		return this.usersService.sendResetPassword(dto.email)
@@ -50,12 +51,12 @@ export class UsersController {
 	@ErrorApiResponse(
 		HttpStatus.UNAUTHORIZED,
 		'Не верный токен либо не верный тип токена',
-		'Токен не валидный'
+		USERS_ERRORS.INVALID_TOKEN
 	)
 	@ErrorApiResponse(
 		HttpStatus.BAD_REQUEST,
 		'Просроченный токен',
-		'Токен просрочен'
+		USERS_ERRORS.TOKEN_EXPIRED
 	)
 	resetPassword(@Body() dto: ResetPasswordDto) {
 		return this.usersService.resetPassword(dto)
