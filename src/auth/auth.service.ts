@@ -2,22 +2,26 @@ import {
 	BadRequestException,
 	Injectable,
 	InternalServerErrorException,
+	Logger,
 	UnauthorizedException
 } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import { JwtService } from '@nestjs/jwt'
 import { User } from '@prisma/client'
+import { hash, verify } from 'argon2'
 import { Response, type Request } from 'express'
+import { MailService } from 'src/mail/mail.service'
+import { PrismaService } from 'src/prisma/prisma.service'
 import { CreateUserDto } from 'src/users/dto/create-user.dto'
 import { UsersService } from 'src/users/users.service'
-import { AuthDto } from './dto/auth.dto'
-import { verify } from 'argon2'
-import { ConfigService } from '@nestjs/config'
-import { MailService } from 'src/mail/mail.service'
 import { ConfirmRegister } from 'src/utils/templates/confirmRegister.type'
-import { PrismaService } from 'src/prisma/prisma.service'
+import { AUTH_ERRORS } from './constants/auth-errors'
+import { AuthDto } from './dto/auth.dto'
 
 @Injectable()
 export class AuthService {
+	private readonly logger = new Logger(AuthService.name)
+
 	constructor(
 		private readonly usersService: UsersService,
 		private readonly jwtService: JwtService,
@@ -27,88 +31,109 @@ export class AuthService {
 	) {}
 
 	async register(dto: CreateUserDto) {
-		await this.usersService.isNotHasUser(dto.email)
+		const data = {
+			message: 'Если email не зарегестрирован, письмо отправлено'
+		}
+
+		const user = await this.usersService.findByEmailNoValidation(dto.email)
+		if (user) return data
+
+		const hashPassword = await hash(dto.password)
+
+		await this.prismaService.pendingUser.deleteMany({
+			where: { email: dto.email }
+		})
 
 		const pendingUser = await this.prismaService.pendingUser.create({
 			data: {
-				...dto
+				email: dto.email,
+				name: dto.name,
+				surname: dto.surname,
+				password: hashPassword
 			}
 		})
 
-		await this.sendConfirmEmail(dto.email, {
+		this.sendConfirmEmail(dto.email, {
 			name: dto.name,
 			surname: dto.surname,
 			link: `${this.configService.getOrThrow('CLIENT_URL')}/auth/confirm?token=${pendingUser.token}`,
 			title: 'Подтверждение регистрации'
-		})
+		}).catch(err => this.logger.debug(err))
 
-		return {
-			message: 'Письмо отправлено'
-		}
+		return data
 	}
 
 	async confirmedRegister(token: string, req: Request) {
-		const pendingUser = await this.prismaService.pendingUser.findUnique({
-			where: {
-				token
+		const user = await this.prismaService.$transaction(async tx => {
+			const pendingUser = await tx.pendingUser.findUnique({
+				where: {
+					token
+				}
+			})
+			if (!pendingUser)
+				throw new UnauthorizedException(AUTH_ERRORS.INVALID_TOKEN)
+
+			const now = new Date()
+			if (now > pendingUser.expiresAt) {
+				throw new BadRequestException(AUTH_ERRORS.TOKEN_EXPIRED)
 			}
-		})
-		if (!pendingUser) throw new UnauthorizedException('Токен не валидный')
 
-		const now = new Date()
-		if (now > pendingUser.expiresAt) {
-			throw new BadRequestException('Токен просрочен')
-		}
+			const user = await this.usersService.create(
+				{
+					email: pendingUser.email,
+					name: pendingUser.name,
+					surname: pendingUser.surname,
+					password: pendingUser.password
+				},
+				tx
+			)
 
-		const user = await this.usersService.create({
-			email: pendingUser.email,
-			name: pendingUser.name,
-			surname: pendingUser.surname,
-			password: pendingUser.password
+			await tx.pendingUser.delete({
+				where: { id: pendingUser.id }
+			})
+
+			return user
 		})
 
 		await this.saveSession(req, user)
-
-		await this.prismaService.pendingUser.delete({
-			where: { id: pendingUser.id }
-		})
 
 		return user
 	}
 
 	async login(dto: AuthDto, req: Request) {
-		const { password, ...user } = await this.usersService.findByEmail(dto.email)
+		const userData = await this.usersService.findByEmail(dto.email)
 
-		const isValidPassword = await verify(password, dto.password)
+		const isValidPassword = await verify(userData.password, dto.password)
 		if (!isValidPassword)
-			throw new UnauthorizedException('Email или пароль не правильные')
+			throw new UnauthorizedException(AUTH_ERRORS.INVALID_CREDENTIALS)
 
-		await this.saveSession(req, user)
+		await this.saveSession(req, userData)
+
+		const { password, ...user } = userData
 
 		return user
 	}
 
 	async logout(req: Request, res: Response): Promise<{ message: string }> {
-		return new Promise((resolve, reject) => {
-			if (!req.session.token)
-				return reject(
-					new UnauthorizedException(
-						'Вы не авторизованы, чтобы выйти из аккаунта.'
-					)
-				)
+		if (!req.session.token)
+			throw new UnauthorizedException(
+				'Вы не авторизованы, чтобы выйти из аккаунта.'
+			)
 
+		await new Promise((resolve, reject) => {
 			req.session.destroy(err => {
 				if (err)
 					return reject(
 						new InternalServerErrorException('Не удалось выйти из аккаунта.')
 					)
-
-				res.clearCookie(this.configService.getOrThrow<string>('COOKIE_NAME'))
-				resolve({
-					message: 'Вы успешно вышли из аккаунта.'
-				})
+				resolve(true)
 			})
 		})
+
+		res.clearCookie(this.configService.getOrThrow<string>('COOKIE_NAME'))
+		return {
+			message: 'Вы успешно вышли из аккаунта.'
+		}
 	}
 
 	private async sendConfirmEmail(to: string, data: ConfirmRegister) {
@@ -123,22 +148,25 @@ export class AuthService {
 	}
 
 	private async generateJwtToken(user: Omit<User, 'password'>) {
-		return this.jwtService.signAsync({
-			sub: user.id,
-			email: user.email
-		})
+		return this.jwtService.signAsync(
+			{
+				sub: user.id,
+				email: user.email
+			},
+			{
+				expiresIn: '7d'
+			}
+		)
 	}
 
 	private async saveSession(req: Request, user: Omit<User, 'password'>) {
 		const token = await this.generateJwtToken(user)
 
-		return new Promise((resolve, reject) => {
+		return new Promise<void>((resolve, reject) => {
 			req.session.token = token
 
 			req.session.save(err => {
 				if (err) {
-					console.log(err)
-
 					return reject(
 						new InternalServerErrorException(
 							'Не удалось сохранить сессию. Проверьте, правильно ли настроены параметры сесси.'
@@ -146,7 +174,7 @@ export class AuthService {
 					)
 				}
 
-				resolve(user)
+				resolve()
 			})
 		})
 	}

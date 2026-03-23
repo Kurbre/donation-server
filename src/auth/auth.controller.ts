@@ -1,7 +1,6 @@
 import {
 	Body,
 	Controller,
-	Get,
 	HttpCode,
 	HttpStatus,
 	Post,
@@ -9,13 +8,14 @@ import {
 	Req,
 	Res
 } from '@nestjs/common'
+import { ApiBody, ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger'
 import { type Request, type Response } from 'express'
 import { CreateUserDto } from 'src/users/dto/create-user.dto'
+import { UserResponseDto } from 'src/users/dto/user-response.dto'
+import { ErrorApiResponse } from 'src/utils/decorators/error-api-response.decorator'
+import { MessageResponseDto } from '../utils/dto/message-response.dto'
 import { AuthService } from './auth.service'
 import { AuthDto } from './dto/auth.dto'
-import { ApiBody, ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger'
-import { MessageResponseDto } from '../utils/dto/message-response.dto'
-import { UserResponseDto } from 'src/users/dto/user-response.dto'
 
 @Controller('auth')
 export class AuthController {
@@ -30,17 +30,11 @@ export class AuthController {
 		type: MessageResponseDto,
 		description: 'Письмо подтверждения отправлено'
 	})
-	@ApiResponse({
-		status: HttpStatus.BAD_REQUEST,
-		description: 'Пользователь с таким email уже зарегестрирован',
-		schema: {
-			example: {
-				message: 'Пользователь с таким email уже зарегестрирован',
-				error: 'Bad Request',
-				statusCode: 400
-			}
-		}
-	})
+	@ErrorApiResponse(
+		HttpStatus.BAD_REQUEST,
+		'Пользователь с таким email уже зарегистрирован',
+		'Пользователь с таким email уже зарегистрирован'
+	)
 	register(@Body() dto: CreateUserDto) {
 		return this.authService.register(dto)
 	}
@@ -51,31 +45,19 @@ export class AuthController {
 	@ApiQuery({ name: 'token', description: 'Токен из письма', required: true })
 	@ApiResponse({
 		status: HttpStatus.CREATED,
-		description: 'Пользователь подтвержден и зарегестрирован',
+		description: 'Пользователь подтвержден и зарегистрирован',
 		type: UserResponseDto
 	})
-	@ApiResponse({
-		status: HttpStatus.UNAUTHORIZED,
-		description: 'Не верный токен',
-		schema: {
-			example: {
-				message: 'Токен не валидный',
-				error: 'Unauthorized',
-				statusCode: 401
-			}
-		}
-	})
-	@ApiResponse({
-		status: HttpStatus.BAD_REQUEST,
-		description: 'Просроченный токен',
-		schema: {
-			example: {
-				message: 'Токен просрочен',
-				error: 'Bad Request',
-				statusCode: 400
-			}
-		}
-	})
+	@ErrorApiResponse(
+		HttpStatus.UNAUTHORIZED,
+		'Неверный токен',
+		'Токен не валидный'
+	)
+	@ErrorApiResponse(
+		HttpStatus.BAD_REQUEST,
+		'Просроченный токен',
+		'Токен просрочен'
+	)
 	confirmedRegister(@Query('token') token: string, @Req() req: Request) {
 		return this.authService.confirmedRegister(token, req)
 	}
@@ -89,28 +71,16 @@ export class AuthController {
 		description: 'Пользователь залогинен',
 		type: UserResponseDto
 	})
-	@ApiResponse({
-		status: HttpStatus.UNAUTHORIZED,
-		description: 'Неверный email или пароль',
-		schema: {
-			example: {
-				message: 'Email или пароль не правильные',
-				error: 'Unauthorized',
-				statusCode: 401
-			}
-		}
-	})
-	@ApiResponse({
-		status: HttpStatus.NOT_FOUND,
-		schema: {
-			example: {
-				message: 'Пользователь с таким Email не найден',
-				error: 'Not found',
-				statusCode: 404
-			}
-		},
-		description: 'Пользователь не найден'
-	})
+	@ErrorApiResponse(
+		HttpStatus.UNAUTHORIZED,
+		'Неверный email или пароль',
+		'Email или пароль не правильные'
+	)
+	@ErrorApiResponse(
+		HttpStatus.NOT_FOUND,
+		'Пользователь не найден',
+		'Пользователь с таким Email не найден'
+	)
 	login(@Body() dto: AuthDto, @Req() req: Request) {
 		return this.authService.login(dto, req)
 	}
@@ -123,28 +93,16 @@ export class AuthController {
 		description: 'Вы успешно вышли',
 		type: MessageResponseDto
 	})
-	@ApiResponse({
-		status: HttpStatus.UNAUTHORIZED,
-		description: 'Пользователь не авторизован',
-		schema: {
-			example: {
-				message: 'Вы не авторизованы, чтобы выйти из аккаунта.',
-				error: 'Unauthorized',
-				statusCode: 401
-			}
-		}
-	})
-	@ApiResponse({
-		status: HttpStatus.INTERNAL_SERVER_ERROR,
-		description: 'Не удалось выйти из аккаунта',
-		schema: {
-			example: {
-				message: 'Не удалось выйти из аккаунта.',
-				error: 'Internal server error',
-				statusCode: 500
-			}
-		}
-	})
+	@ErrorApiResponse(
+		HttpStatus.UNAUTHORIZED,
+		'Пользователь не авторизован',
+		'Вы не авторизованы, чтобы выйти из аккаунта.'
+	)
+	@ErrorApiResponse(
+		HttpStatus.INTERNAL_SERVER_ERROR,
+		'Не удалось выйти из аккаунта',
+		'Не удалось выйти из аккаунта.'
+	)
 	logout(@Res({ passthrough: true }) res: Response, @Req() req: Request) {
 		return this.authService.logout(req, res)
 	}

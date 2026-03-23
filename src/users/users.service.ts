@@ -11,7 +11,7 @@ import { MailService } from 'src/mail/mail.service'
 import { ConfirmRegister } from 'src/utils/templates/confirmRegister.type'
 import { ResetPassword } from 'src/utils/templates/resetPassword.type'
 import { ConfigService } from '@nestjs/config'
-import { TokenTypes } from '@prisma/client'
+import { Prisma, TokenTypes } from '@prisma/client'
 import { ResetPasswordDto } from './dto/reset-password.dto'
 
 @Injectable()
@@ -22,8 +22,11 @@ export class UsersService {
 		private readonly configService: ConfigService
 	) {}
 
-	async create(dto: CreateUserDto) {
-		const isFindedUser = await this.prismaService.user.findUnique({
+	async create(
+		dto: CreateUserDto,
+		prisma: Prisma.TransactionClient | PrismaService = this.prismaService
+	) {
+		const isFindedUser = await prisma.user.findUnique({
 			where: {
 				email: dto.email
 			}
@@ -33,12 +36,12 @@ export class UsersService {
 				'Пользователь с таким email уже зарегестрирован'
 			)
 
-		const hashPassword = await hash(dto.password)
-
-		return await this.prismaService.user.create({
+		return await prisma.user.create({
 			data: {
-				...dto,
-				password: hashPassword
+				email: dto.email,
+				name: dto.name,
+				surname: dto.surname,
+				password: dto.password
 			},
 			select: {
 				id: true,
@@ -85,16 +88,14 @@ export class UsersService {
 		return user
 	}
 
-	async isNotHasUser(email: string) {
+	async findByEmailNoValidation(email: string) {
 		const user = await this.prismaService.user.findUnique({
 			where: {
 				email
 			}
 		})
-		if (user)
-			throw new BadRequestException(
-				'Пользователь с таким email уже зарегестрирован'
-			)
+
+		return user
 	}
 
 	async sendResetPassword(email: string) {

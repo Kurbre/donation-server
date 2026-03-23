@@ -7,16 +7,15 @@ import {
 	Post
 } from '@nestjs/common'
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { Auth } from 'src/auth/auth.decorator'
+import { Auth } from 'src/auth/decorators/auth.decorator'
 import { MessageResponseDto } from 'src/utils/dto/message-response.dto'
+import { ErrorApiResponse } from '../utils/decorators/error-api-response.decorator'
+import { GetUser } from './decorators/users.decorator'
 import { ChangePasswordDto } from './dto/change-password.dto'
 import { ResetPasswordDto } from './dto/reset-password.dto'
 import { SendResetPasswordDto } from './dto/send-reset-password.dto'
 import { UserResponseDto } from './dto/user-response.dto'
-import { GetUser } from './decorators/users.decorator'
 import { UsersService } from './users.service'
-import { ErrorResponseDto } from 'src/utils/dto/error-response.dto'
-import { ErrorApiResponse } from './decorators/error-api-response.decorator'
 
 @ApiTags('Users')
 @Controller('users')
@@ -31,17 +30,11 @@ export class UsersController {
 		type: MessageResponseDto,
 		description: 'Письмо сброса пароля отправлено'
 	})
-	@ApiResponse({
-		status: HttpStatus.NOT_FOUND,
-		schema: {
-			example: {
-				message: 'Пользователь с таким Email не найден',
-				error: 'Not found',
-				statusCode: 404
-			}
-		},
-		description: 'Пользователь не найден'
-	})
+	@ErrorApiResponse(
+		HttpStatus.NOT_FOUND,
+		'Пользователь не найден',
+		'Пользователь с таким Email не найден'
+	)
 	sendResetPassword(@Body() dto: SendResetPasswordDto) {
 		return this.usersService.sendResetPassword(dto.email)
 	}
@@ -77,15 +70,6 @@ export class UsersController {
 		description: 'Пароль успешно изменен',
 		type: MessageResponseDto
 	})
-	@ApiResponse({
-		status: HttpStatus.UNAUTHORIZED,
-		description: 'Пользователь не авторизован',
-		schema: {
-			example: {
-				message: 'Вы не авторизованы'
-			}
-		}
-	})
 	changePassword(
 		@Body() dto: ChangePasswordDto,
 		@GetUser('id') userId: string
@@ -101,15 +85,6 @@ export class UsersController {
 		status: HttpStatus.OK,
 		description: 'Успешно получили профиль',
 		type: UserResponseDto
-	})
-	@ApiResponse({
-		status: HttpStatus.UNAUTHORIZED,
-		description: 'Пользователь не авторизован',
-		schema: {
-			example: {
-				message: 'Вы не авторизованы'
-			}
-		}
 	})
 	getProfile(@GetUser('id') userId: string) {
 		return this.usersService.findById(userId)
