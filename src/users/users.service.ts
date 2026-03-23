@@ -12,6 +12,7 @@ import { ConfirmRegister } from 'src/utils/templates/confirmRegister.type'
 import { ResetPassword } from 'src/utils/templates/resetPassword.type'
 import { ConfigService } from '@nestjs/config'
 import { TokenTypes } from '@prisma/client'
+import { ResetPasswordDto } from './dto/reset-password.dto'
 
 @Injectable()
 export class UsersService {
@@ -121,7 +122,7 @@ export class UsersService {
 		}
 	}
 
-	async resetPassword(tokenId: string, password: string) {
+	async resetPassword({ token: tokenId, password }: ResetPasswordDto) {
 		const token = await this.prismaService.token.findUnique({
 			where: {
 				id: tokenId

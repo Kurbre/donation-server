@@ -2,6 +2,7 @@ import {
 	Body,
 	Controller,
 	Get,
+	HttpCode,
 	HttpStatus,
 	Post,
 	Query,
@@ -13,7 +14,7 @@ import { CreateUserDto } from 'src/users/dto/create-user.dto'
 import { AuthService } from './auth.service'
 import { AuthDto } from './dto/auth.dto'
 import { ApiBody, ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger'
-import { MessageResponseDto } from './dto/message-response.dto'
+import { MessageResponseDto } from '../utils/dto/message-response.dto'
 import { UserResponseDto } from 'src/users/dto/user-response.dto'
 
 @Controller('auth')
@@ -21,15 +22,12 @@ export class AuthController {
 	constructor(private readonly authService: AuthService) {}
 
 	@Post('register')
+	@HttpCode(HttpStatus.OK)
 	@ApiOperation({ summary: 'Регистрация пользователя' })
 	@ApiBody({ type: CreateUserDto })
 	@ApiResponse({
 		status: HttpStatus.OK,
-		schema: {
-			example: {
-				message: 'Письмо отправлено'
-			}
-		},
+		type: MessageResponseDto,
 		description: 'Письмо подтверждения отправлено'
 	})
 	@ApiResponse({
@@ -48,11 +46,12 @@ export class AuthController {
 	}
 
 	@Post('confirmed-register')
+	@HttpCode(HttpStatus.CREATED)
 	@ApiOperation({ summary: 'Подтверждение регистрации по токену' })
 	@ApiQuery({ name: 'token', description: 'Токен из письма', required: true })
 	@ApiResponse({
-		status: HttpStatus.OK,
-		description: 'Пользователь подтвержден и залогинен',
+		status: HttpStatus.CREATED,
+		description: 'Пользователь подтвержден и зарегестрирован',
 		type: UserResponseDto
 	})
 	@ApiResponse({
@@ -82,6 +81,7 @@ export class AuthController {
 	}
 
 	@Post('login')
+	@HttpCode(HttpStatus.OK)
 	@ApiOperation({ summary: 'Вход пользователя' })
 	@ApiBody({ type: AuthDto })
 	@ApiResponse({
@@ -116,15 +116,12 @@ export class AuthController {
 	}
 
 	@Post('logout')
+	@HttpCode(HttpStatus.OK)
 	@ApiOperation({ summary: 'Выход пользователя' })
 	@ApiResponse({
 		status: HttpStatus.OK,
 		description: 'Вы успешно вышли',
-		schema: {
-			example: {
-				message: 'Вы успешно вышли из аккаунта.'
-			}
-		}
+		type: MessageResponseDto
 	})
 	@ApiResponse({
 		status: HttpStatus.UNAUTHORIZED,

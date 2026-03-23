@@ -1,13 +1,21 @@
-import { Body, Controller, Get, HttpStatus, Post } from '@nestjs/common'
+import {
+	Body,
+	Controller,
+	Get,
+	HttpCode,
+	HttpStatus,
+	Post
+} from '@nestjs/common'
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { Auth } from 'src/auth/auth.decorator'
-import { MessageResponseDto } from 'src/auth/dto/message-response.dto'
+import { MessageResponseDto } from 'src/utils/dto/message-response.dto'
 import { ChangePasswordDto } from './dto/change-password.dto'
 import { ResetPasswordDto } from './dto/reset-password.dto'
 import { SendResetPasswordDto } from './dto/send-reset-password.dto'
 import { UserResponseDto } from './dto/user-response.dto'
 import { GetUser } from './users.decorator'
 import { UsersService } from './users.service'
+import { ErrorResponseDto } from 'src/utils/dto/error-response.dto'
 
 @ApiTags('Users')
 @Controller('users')
@@ -15,14 +23,11 @@ export class UsersController {
 	constructor(private readonly usersService: UsersService) {}
 
 	@Post('send-reset-password')
+	@HttpCode(HttpStatus.OK)
 	@ApiOperation({ summary: 'Отправка письма о сбросе пароля' })
 	@ApiResponse({
 		status: HttpStatus.OK,
-		schema: {
-			example: {
-				message: 'Письмо отправлено'
-			}
-		},
+		type: MessageResponseDto,
 		description: 'Письмо сброса пароля отправлено'
 	})
 	@ApiResponse({
@@ -41,15 +46,12 @@ export class UsersController {
 	}
 
 	@Post('reset-password')
+	@HttpCode(HttpStatus.OK)
 	@ApiOperation({ summary: 'Сброс пароля' })
 	@ApiResponse({
 		status: HttpStatus.OK,
 		description: 'Пароль успешно изменен на новый',
-		schema: {
-			example: {
-				message: 'Пароль успешно изменен на новый'
-			}
-		}
+		type: MessageResponseDto
 	})
 	@ApiResponse({
 		status: HttpStatus.UNAUTHORIZED,
@@ -74,20 +76,17 @@ export class UsersController {
 		}
 	})
 	resetPassword(@Body() dto: ResetPasswordDto) {
-		return this.usersService.resetPassword(dto.token, dto.password)
+		return this.usersService.resetPassword(dto)
 	}
 
 	@Auth()
 	@Post('change-password')
+	@HttpCode(HttpStatus.OK)
 	@ApiOperation({ summary: 'Смена пароля' })
 	@ApiResponse({
 		status: HttpStatus.OK,
 		description: 'Пароль успешно изменен',
-		schema: {
-			example: {
-				message: 'Пароль успешно изменен'
-			}
-		}
+		type: MessageResponseDto
 	})
 	@ApiResponse({
 		status: HttpStatus.UNAUTHORIZED,
@@ -107,6 +106,7 @@ export class UsersController {
 
 	@Auth()
 	@Get('profile')
+	@HttpCode(HttpStatus.OK)
 	@ApiOperation({ summary: 'Получить профиль' })
 	@ApiResponse({
 		status: HttpStatus.OK,
