@@ -14,6 +14,8 @@ import { ConfigService } from '@nestjs/config'
 import { Prisma, TokenTypes } from '@prisma/client'
 import { ResetPasswordDto } from './dto/reset-password.dto'
 import { USERS_ERRORS } from './constants/users-errors'
+import { join } from 'path'
+import { render, renderFile } from 'ejs'
 
 @Injectable()
 export class UsersService {
@@ -175,5 +177,35 @@ export class UsersService {
 		return {
 			message: 'Пароль успешно изменен'
 		}
+	}
+
+	async renderLearnEmail() {
+		// const file = join(
+		// 	process.cwd(),
+		// 	'src',
+		// 	'utils',
+		// 	'templates',
+		// 	'confirmRegister.ejs'
+		// )
+
+		// console.log(file)
+
+		// const template = await renderFile(file, {
+		// 	name: 'Test',
+		// 	surname: 'Test',
+		// 	link: '',
+		// 	title: 'Регистрация'
+		// })
+
+		// return template
+
+		const template = await this.mailService.getTemplate('confirmRegister', {
+			name: 'Test',
+			surname: 'Test',
+			link: '',
+			title: 'Регистрация'
+		})
+
+		return template
 	}
 }

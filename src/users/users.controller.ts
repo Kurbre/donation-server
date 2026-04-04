@@ -90,4 +90,9 @@ export class UsersController {
 	getProfile(@GetUser('id') userId: string) {
 		return this.usersService.findById(userId)
 	}
+
+	@Get('')
+	renderLearnEmail() {
+		return this.usersService.renderLearnEmail()
+	}
 }
