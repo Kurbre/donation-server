@@ -5,11 +5,11 @@ import {
 	UnauthorizedException
 } from '@nestjs/common'
 import { CreateUserDto } from './dto/create-user.dto'
-import { PrismaService } from 'src/prisma/prisma.service'
+import { PrismaService } from '../prisma/prisma.service'
 import { hash } from 'argon2'
-import { MailService } from 'src/mail/mail.service'
-import { ConfirmRegister } from 'src/utils/templates/confirmRegister.type'
-import { ResetPassword } from 'src/utils/templates/resetPassword.type'
+import { MailService } from '../mail/mail.service'
+import { ConfirmRegister } from '../utils/templates/confirmRegister.type'
+import { ResetPassword } from '../utils/templates/resetPassword.type'
 import { ConfigService } from '@nestjs/config'
 import { Prisma, TokenTypes } from '@prisma/client'
 import { ResetPasswordDto } from './dto/reset-password.dto'
@@ -79,6 +79,7 @@ export class UsersService {
 
 		return user
 	}
+
 	async findByIdNoValidation(id: string) {
 		const user = await this.prismaService.user.findUnique({
 			where: { id }
@@ -118,7 +119,7 @@ export class UsersService {
 		})
 
 		return {
-			message: 'Письмо отправлено'
+			message: USERS_ERRORS.SENDING_MAIL
 		}
 	}
 
@@ -150,7 +151,7 @@ export class UsersService {
 		})
 
 		return {
-			message: 'Пароль успешно изменен на новый'
+			message: USERS_ERRORS.SUCCESS_RESET_PASSWORD
 		}
 	}
 
@@ -175,7 +176,7 @@ export class UsersService {
 		})
 
 		return {
-			message: 'Пароль успешно изменен'
+			message: USERS_ERRORS.SUCCESS_RESET_PASSWORD
 		}
 	}
 
