@@ -1,5 +1,5 @@
 import { applyDecorators, HttpStatus, UseGuards } from '@nestjs/common'
-import { ErrorApiResponse } from 'src/utils/decorators/error-api-response.decorator'
+import { ErrorApiResponse } from '../../utils/decorators/error-api-response.decorator'
 import { AuthGuard } from '../guards/auth.guard'
 
 export const Auth = () =>

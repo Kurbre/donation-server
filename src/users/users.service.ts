@@ -179,34 +179,4 @@ export class UsersService {
 			message: USERS_ERRORS.SUCCESS_RESET_PASSWORD
 		}
 	}
-
-	async renderLearnEmail() {
-		// const file = join(
-		// 	process.cwd(),
-		// 	'src',
-		// 	'utils',
-		// 	'templates',
-		// 	'confirmRegister.ejs'
-		// )
-
-		// console.log(file)
-
-		// const template = await renderFile(file, {
-		// 	name: 'Test',
-		// 	surname: 'Test',
-		// 	link: '',
-		// 	title: 'Регистрация'
-		// })
-
-		// return template
-
-		const template = await this.mailService.getTemplate('confirmRegister', {
-			name: 'Test',
-			surname: 'Test',
-			link: '',
-			title: 'Регистрация'
-		})
-
-		return template
-	}
 }

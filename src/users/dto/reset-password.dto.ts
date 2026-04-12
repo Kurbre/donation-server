@@ -12,7 +12,6 @@ export class ResetPasswordDto {
 	@IsNotEmpty({ message: 'Поле токен не может быть пустым' })
 	@IsString({ message: 'Поле токен не являеться строкой' })
 	token: string
-	'ignoreDeprecations': '6.0'
 
 	@ApiProperty({ example: 'qwerty123' })
 	@IsNotEmpty({ message: 'Поле пароль не может быть пустым' })

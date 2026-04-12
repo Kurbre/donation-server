@@ -5,7 +5,7 @@ import {
 	UnauthorizedException
 } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
-import { UsersService } from 'src/users/users.service'
+import { UsersService } from '../../users/users.service'
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -31,8 +31,6 @@ export class AuthGuard implements CanActivate {
 
 			return true
 		} catch (error) {
-			console.log(error)
-
 			throw new UnauthorizedException('Вы не авторизованы')
 		}
 	}

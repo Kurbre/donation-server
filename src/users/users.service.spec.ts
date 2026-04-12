@@ -10,21 +10,13 @@ import {
 	NotFoundException,
 	UnauthorizedException
 } from '@nestjs/common'
+import { mockUser } from '../utils/mocks/user.mock'
 
 jest.mock('argon2', () => ({
 	hash: jest.fn()
 }))
 
 import * as argon2 from 'argon2'
-
-const mockUser = {
-	id: '123123',
-	name: 'Name',
-	surname: 'Surname',
-	email: 'example@gmail.com',
-	createdAt: new Date('2026-04-10T18:44:57.747Z'),
-	updatedAt: new Date('2026-04-10T18:44:57.747Z')
-}
 
 const mockToken: {
 	id: string
@@ -233,8 +225,7 @@ describe('Users service', () => {
 		;(argon2.hash as jest.Mock).mockResolvedValue('hashedPassword')
 		const result = await service.resetPassword({
 			token: mockToken.id,
-			password: '123123123',
-			ignoreDeprecations: '6.0'
+			password: '123123123'
 		})
 
 		expect(spyFindTokenUnique).toHaveBeenCalledWith({
@@ -270,8 +261,7 @@ describe('Users service', () => {
 		await expect(
 			service.resetPassword({
 				token: mockToken.id,
-				password: '123123123',
-				ignoreDeprecations: '6.0'
+				password: '123123123'
 			})
 		).rejects.toThrow(UnauthorizedException)
 
@@ -293,8 +283,7 @@ describe('Users service', () => {
 		await expect(
 			service.resetPassword({
 				token: invalidToken.id,
-				password: '123123123',
-				ignoreDeprecations: '6.0'
+				password: '123123123'
 			})
 		).rejects.toThrow(UnauthorizedException)
 
@@ -316,8 +305,7 @@ describe('Users service', () => {
 		await expect(
 			service.resetPassword({
 				token: invalidToken.id,
-				password: '123123123',
-				ignoreDeprecations: '6.0'
+				password: '123123123'
 			})
 		).rejects.toThrow(UnauthorizedException)
 
@@ -339,8 +327,7 @@ describe('Users service', () => {
 		await expect(
 			service.resetPassword({
 				token: invalidToken.id,
-				password: '123123123',
-				ignoreDeprecations: '6.0'
+				password: '123123123'
 			})
 		).rejects.toThrow(BadRequestException)
 

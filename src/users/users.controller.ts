@@ -7,8 +7,8 @@ import {
 	Post
 } from '@nestjs/common'
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { Auth } from 'src/auth/decorators/auth.decorator'
-import { MessageResponseDto } from 'src/utils/dto/message-response.dto'
+import { Auth } from '../auth/decorators/auth.decorator'
+import { MessageResponseDto } from '../utils/dto/message-response.dto'
 import { ErrorApiResponse } from '../utils/decorators/error-api-response.decorator'
 import { GetUser } from './decorators/users.decorator'
 import { ChangePasswordDto } from './dto/change-password.dto'
@@ -89,10 +89,5 @@ export class UsersController {
 	})
 	getProfile(@GetUser('id') userId: string) {
 		return this.usersService.findById(userId)
-	}
-
-	@Get('')
-	renderLearnEmail() {
-		return this.usersService.renderLearnEmail()
 	}
 }
