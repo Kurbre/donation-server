@@ -10,11 +10,11 @@ import { JwtService } from '@nestjs/jwt'
 import { User } from '@prisma/client'
 import { hash, verify } from 'argon2'
 import { Response, type Request } from 'express'
-import { MailService } from 'src/mail/mail.service'
-import { PrismaService } from 'src/prisma/prisma.service'
-import { CreateUserDto } from 'src/users/dto/create-user.dto'
-import { UsersService } from 'src/users/users.service'
-import { ConfirmRegister } from 'src/utils/templates/confirmRegister.type'
+import { MailService } from '../mail/mail.service'
+import { PrismaService } from '../prisma/prisma.service'
+import { CreateUserDto } from '../users/dto/create-user.dto'
+import { UsersService } from '../users/users.service'
+import { ConfirmRegister } from '../utils/templates/confirmRegister.type'
 import { AUTH_ERRORS } from './constants/auth-errors'
 import { AuthDto } from './dto/auth.dto'
 
@@ -32,7 +32,7 @@ export class AuthService {
 
 	async register(dto: CreateUserDto) {
 		const data = {
-			message: 'Если email не зарегестрирован, письмо отправлено'
+			message: AUTH_ERRORS.SUCCESS_SEND_REGISTER_MAIL
 		}
 
 		const user = await this.usersService.findByEmailNoValidation(dto.email)

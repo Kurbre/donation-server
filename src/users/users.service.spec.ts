@@ -47,7 +47,7 @@ describe('Users service', () => {
 	let configService: ConfigService
 	let mailService: MailService
 
-	beforeAll(async () => {
+	beforeEach(async () => {
 		const module: TestingModule = await Test.createTestingModule({
 			providers: [
 				UsersService,
