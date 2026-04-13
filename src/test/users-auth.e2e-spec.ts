@@ -106,6 +106,12 @@ describe('Users and auth (e2e)', () => {
 
 		expect(tokenRecord).toBeDefined()
 
+		const findTokenResult = await request(app.getHttpServer())
+			.get(`/users/reset-password-token/${tokenRecord?.id}`)
+			.expect(200)
+
+		expect(findTokenResult.body).toBeDefined()
+
 		const sendResetPasswordResponse = await request(app.getHttpServer())
 			.post('/users/reset-password')
 			.send({

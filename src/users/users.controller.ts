@@ -4,6 +4,7 @@ import {
 	Get,
 	HttpCode,
 	HttpStatus,
+	Param,
 	Post
 } from '@nestjs/common'
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
@@ -60,6 +61,23 @@ export class UsersController {
 	)
 	resetPassword(@Body() dto: ResetPasswordDto) {
 		return this.usersService.resetPassword(dto)
+	}
+
+	@Get('reset-password-token/:id')
+	@HttpCode(HttpStatus.OK)
+	@ApiOperation({ summary: 'Получить токен' })
+	@ApiResponse({
+		status: HttpStatus.OK,
+		description: 'Пароль успешно изменен на новый',
+		type: Boolean
+	})
+	@ErrorApiResponse(
+		HttpStatus.NOT_FOUND,
+		'Не валидный токен',
+		USERS_ERRORS.INVALID_TOKEN
+	)
+	findResetPasswordById(@Param('id') tokenId: string) {
+		return this.usersService.findResetPasswordToken(tokenId)
 	}
 
 	@Auth()

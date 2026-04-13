@@ -409,4 +409,29 @@ describe('Users service', () => {
 
 		expect(prismaService.user.update).not.toHaveBeenCalled()
 	})
+
+	// Find token for reset password
+	it('Should find token for reset password', async () => {
+		const result = await service.findResetPasswordToken(mockToken.id)
+
+		expect(prismaService.token.findUnique).toHaveBeenCalledWith({
+			where: { id: mockToken.id }
+		})
+		expect(prismaService.token.findUnique).toHaveBeenCalledTimes(1)
+
+		expect(result).toBe(true)
+	})
+
+	it('Should find token for reset password if not valid token', async () => {
+		jest.spyOn(prismaService.token, 'findUnique').mockResolvedValue(null)
+
+		await expect(service.findResetPasswordToken(mockToken.id)).rejects.toThrow(
+			NotFoundException
+		)
+
+		expect(prismaService.token.findUnique).toHaveBeenCalledWith({
+			where: { id: mockToken.id }
+		})
+		expect(prismaService.token.findUnique).toHaveBeenCalledTimes(1)
+	})
 })

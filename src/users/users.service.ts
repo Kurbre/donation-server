@@ -155,6 +155,17 @@ export class UsersService {
 		}
 	}
 
+	async findResetPasswordToken(tokenId: string) {
+		const token = await this.prismaService.token.findUnique({
+			where: {
+				id: tokenId
+			}
+		})
+		if (!token) throw new NotFoundException('Невалидный токен.')
+
+		return true
+	}
+
 	async sendResetPasswordEmail(to: string, data: ResetPassword) {
 		const template = await this.mailService.getTemplate('resetPassword', data)
 

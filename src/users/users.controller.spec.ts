@@ -27,7 +27,8 @@ describe('Users controller', () => {
 						sendResetPassword: jest.fn(),
 						resetPassword: jest.fn(),
 						changePassword: jest.fn(),
-						findById: jest.fn()
+						findById: jest.fn(),
+						findResetPasswordToken: jest.fn().mockResolvedValue(true)
 					}
 				},
 				{
@@ -164,5 +165,22 @@ describe('Users controller', () => {
 		;(service.findById as jest.Mock).mockRejectedValue(new NotFoundException())
 
 		await expect(service.findById).rejects.toThrow(NotFoundException)
+	})
+
+	// Get reset password token
+	it('should find reset password by id', async () => {
+		const result = await service.findResetPasswordToken('123123')
+
+		expect(result).toBe(true)
+	})
+
+	it('should find reset password by id if not valid token', async () => {
+		jest
+			.spyOn(service, 'findResetPasswordToken')
+			.mockRejectedValue(new NotFoundException())
+
+		await expect(service.findResetPasswordToken('123123')).rejects.toThrow(
+			NotFoundException
+		)
 	})
 })
