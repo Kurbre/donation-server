@@ -17,7 +17,7 @@ export class AuthGuard implements CanActivate {
 	async canActivate(ctx: ExecutionContext) {
 		const req = ctx.switchToHttp().getRequest()
 
-		const token = req.session.token
+		const token = req.session?.token
 
 		if (!token) throw new UnauthorizedException('Вы не авторизованы')
 
