@@ -7,9 +7,10 @@ import { AppModule } from '../app.module'
 import { USERS_ERRORS } from '../users/constants/users-errors'
 import { PrismaService } from '../prisma/prisma.service'
 
-describe('Users Controller (e2e)', () => {
+describe('Users and auth (e2e)', () => {
 	let app: INestApplication<App>
 	let cookie
+	let prisma: PrismaService
 
 	beforeAll(async () => {
 		const module: TestingModule = await Test.createTestingModule({
@@ -28,32 +29,52 @@ describe('Users Controller (e2e)', () => {
 
 		app.enableShutdownHooks()
 
+		prisma = app.get(PrismaService)
+
 		await app.init()
-
-		const resAuth = await request(app.getHttpServer())
-			.post('/auth/login')
-			.send({
-				email: 'catiklou@gmail.com',
-				password: '123123'
-			})
-			.expect(200)
-
-		cookie = resAuth.headers['set-cookie']
 	})
 
 	afterAll(async () => {
-		await request(app.getHttpServer())
-			.post('/users/change-password')
-			.set('Cookie', cookie)
-			.send({
-				password: '123123'
-			})
-			.expect(200)
+		await prisma.user.delete({
+			where: {
+				email: 'test@gmail.com'
+			}
+		})
 
 		await app.close()
 	})
 
-	it('/users/profile (GET)', async () => {
+	it('Register (Post)', async () => {
+		const registerResult = await request(app.getHttpServer())
+			.post('/auth/register')
+			.send({
+				email: 'test@gmail.com',
+				name: 'Test',
+				surname: 'Test',
+				password: '123123'
+			})
+			.expect(200)
+
+		expect(registerResult.body).toHaveProperty('message')
+
+		const token = await prisma.pendingUser.findFirst({
+			where: {
+				email: 'test@gmail.com'
+			}
+		})
+
+		const confirmedRegisterResult = await request(app.getHttpServer())
+			.post(`/auth/confirmed-register?token=${token?.token}`)
+			.expect(201)
+
+		expect(confirmedRegisterResult.body).toHaveProperty('email')
+		expect(confirmedRegisterResult.body).toHaveProperty('name')
+		expect(confirmedRegisterResult.body).toHaveProperty('surname')
+
+		cookie = confirmedRegisterResult.headers['set-cookie']
+	})
+
+	it('Get profile (GET)', async () => {
 		const result = await request(app.getHttpServer())
 			.get('/users/profile')
 			.set('Cookie', cookie)
@@ -68,7 +89,7 @@ describe('Users Controller (e2e)', () => {
 		const sendMailResponse = await request(app.getHttpServer())
 			.post('/users/send-reset-password')
 			.send({
-				email: 'catiklou@gmail.com'
+				email: 'test@gmail.com'
 			})
 			.expect(200)
 
@@ -76,11 +97,9 @@ describe('Users Controller (e2e)', () => {
 			message: USERS_ERRORS.SENDING_MAIL
 		})
 
-		const prisma = app.get(PrismaService)
-
 		const tokenRecord = await prisma.token.findFirst({
 			where: {
-				email: 'catiklou@gmail.com',
+				email: 'test@gmail.com',
 				type: 'RESET_PASSWORD'
 			}
 		})
@@ -102,7 +121,7 @@ describe('Users Controller (e2e)', () => {
 		const resAuth = await request(app.getHttpServer())
 			.post('/auth/login')
 			.send({
-				email: 'catiklou@gmail.com',
+				email: 'test@gmail.com',
 				password: 'newPassword'
 			})
 			.expect(200)
@@ -110,5 +129,36 @@ describe('Users Controller (e2e)', () => {
 		cookie = resAuth.headers['set-cookie']
 
 		expect(resAuth.body).toHaveProperty('email')
+	})
+
+	it('Change password (Post)', async () => {
+		const changePassword = await request(app.getHttpServer())
+			.post('/users/change-password')
+			.set('Cookie', cookie)
+			.send({
+				password: 'qwerty'
+			})
+			.expect(200)
+
+		expect(changePassword.body).toHaveProperty('message')
+
+		const login = await request(app.getHttpServer())
+			.post('/auth/login')
+			.send({
+				email: 'test@gmail.com',
+				password: 'qwerty'
+			})
+			.expect(200)
+
+		cookie = login.headers['set-cookie']
+	})
+
+	it('Logout (Post)', async () => {
+		const logoutResult = await request(app.getHttpServer())
+			.post('/auth/logout')
+			.set('Cookie', cookie)
+			.expect(200)
+
+		expect(logoutResult.body).toHaveProperty('message')
 	})
 })
