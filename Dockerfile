@@ -19,4 +19,4 @@ EXPOSE 3002
 COPY wait-for-db.sh /app/wait-for-db.sh
 RUN chmod +x /app/wait-for-db.sh
 
-CMD ["/bin/bash", "/app/wait-for-db.sh"]
+CMD ["sh", "-c", "npx prisma db push && node dist/src/main.js"]
