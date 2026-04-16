@@ -16,7 +16,4 @@ RUN npm run build
 
 EXPOSE 3002
 
-COPY wait-for-db.sh /app/wait-for-db.sh
-RUN chmod +x /app/wait-for-db.sh
-
-CMD ["sh", "-c", "npx prisma db push && node dist/src/main.js"]
+CMD ["sh", "-c", "npx prisma migrate deploy && npm run start:prod"]
