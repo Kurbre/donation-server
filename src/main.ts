@@ -29,6 +29,8 @@ async function bootstrap() {
 
 	const isProd = config.get<string>('NODE_ENV') === 'production'
 
+	console.log(isProd)
+
 	app.use(
 		session({
 			name: config.getOrThrow<string>('COOKIE_NAME'),
