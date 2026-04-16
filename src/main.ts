@@ -9,6 +9,8 @@ const pgSession = require('connect-pg-simple')
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule)
+	// Для render.com
+	app.getHttpAdapter().getInstance().set('trust proxy', 1)
 	const config = app.get(ConfigService)
 	const pgStore = pgSession(session)
 
@@ -25,9 +27,7 @@ async function bootstrap() {
 		})
 	)
 
-	const isProd = config.getOrThrow<string>('PRODUCTION_MODE') === 'true'
-	// Для render.com
-	app.getHttpAdapter().getInstance().set('trust proxy', 1)
+	const isProd = config.get<string>('NODE_ENV') === 'production'
 
 	app.use(
 		session({
