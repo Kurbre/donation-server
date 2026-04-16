@@ -1,8 +1,8 @@
-import { JwtService } from '@nestjs/jwt'
-import { AuthGuard } from './auth.guard'
-import { UsersService } from 'src/users/users.service'
 import { UnauthorizedException } from '@nestjs/common'
+import { JwtService } from '@nestjs/jwt'
+import { UsersService } from 'src/users/users.service'
 import { mockUser } from '../../utils/mocks/user.mock'
+import { AuthGuard } from './auth.guard'
 
 describe('Auth guard', () => {
 	let guard: AuthGuard

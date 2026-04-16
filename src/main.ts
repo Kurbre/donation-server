@@ -1,10 +1,9 @@
-import { NestFactory } from '@nestjs/core'
-import { AppModule } from './app.module'
-import session from 'express-session'
-import { ConfigService } from '@nestjs/config'
 import { ValidationPipe } from '@nestjs/common'
-import { Pool } from 'pg'
+import { ConfigService } from '@nestjs/config'
+import { NestFactory } from '@nestjs/core'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
+import session from 'express-session'
+import { AppModule } from './app.module'
 
 const pgSession = require('connect-pg-simple')
 

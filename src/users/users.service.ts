@@ -4,18 +4,15 @@ import {
 	NotFoundException,
 	UnauthorizedException
 } from '@nestjs/common'
-import { CreateUserDto } from './dto/create-user.dto'
-import { PrismaService } from '../prisma/prisma.service'
-import { hash } from 'argon2'
-import { MailService } from '../mail/mail.service'
-import { ConfirmRegister } from '../utils/templates/confirmRegister.type'
-import { ResetPassword } from '../utils/templates/resetPassword.type'
 import { ConfigService } from '@nestjs/config'
 import { Prisma, TokenTypes } from '@prisma/client'
-import { ResetPasswordDto } from './dto/reset-password.dto'
+import { hash } from 'argon2'
+import { MailService } from '../mail/mail.service'
+import { PrismaService } from '../prisma/prisma.service'
+import { ResetPassword } from '../utils/templates/resetPassword.type'
 import { USERS_ERRORS } from './constants/users-errors'
-import { join } from 'path'
-import { render, renderFile } from 'ejs'
+import { CreateUserDto } from './dto/create-user.dto'
+import { ResetPasswordDto } from './dto/reset-password.dto'
 
 @Injectable()
 export class UsersService {
