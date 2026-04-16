@@ -25,7 +25,9 @@ async function bootstrap() {
 		})
 	)
 
-	const isProd = Boolean(config.getOrThrow<boolean>('PRODUCTION_MODE'))
+	const isProd = config.getOrThrow<string>('PRODUCTION_MODE') === 'true'
+	// Для render.com
+	app.getHttpAdapter().getInstance().set('trust proxy', 1)
 
 	app.use(
 		session({
