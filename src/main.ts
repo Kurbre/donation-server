@@ -25,6 +25,8 @@ async function bootstrap() {
 		})
 	)
 
+	const isProd = Boolean(config.getOrThrow<boolean>('PRODUCTION_MODE'))
+
 	app.use(
 		session({
 			name: config.getOrThrow<string>('COOKIE_NAME'),
@@ -34,8 +36,8 @@ async function bootstrap() {
 			cookie: {
 				maxAge: 1000 * 60 * 60 * 24 * 3, // 3 дня
 				httpOnly: true, // Защита от XSS
-				secure: Boolean(config.getOrThrow<boolean>('COOKIE_SECURE')),
-				sameSite: config.getOrThrow<boolean>('COOKIE_SAMESITE') // true только если используете HTTPS
+				secure: isProd,
+				sameSite: isProd ? 'none' : 'lax'
 			},
 			store: new pgStore({
 				conString: config.getOrThrow<string>('DATABASE_URL'),

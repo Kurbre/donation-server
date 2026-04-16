@@ -15,8 +15,7 @@ jobs:
       CLIENT_URL: http://localhost:3000
       COOKIE_NAME: access_token
       COOKIE_SECRET_KEY: lgfd,gdlkdlgldfg
-      COOKIE_SECURE: false
-      COOKIE_SAMESITE: 'lax'
+      PRODUCTION_MODE: false
       JWT_SECRET_KEY: dsjksdjdksjfdskj
       DATABASE_URL: postgresql://admin:123123@localhost:5432/donation
       SMTP_USER: youtonlive@gmail.com
@@ -38,7 +37,7 @@ jobs:
       - name: unit test
         run: yarn test
       - name: Start database
-        run: docker compose up -d
+        run: docker compose up -d db
       - name: Wait for Database
         run: sleep 10
       - name: Run Prisma migrations
