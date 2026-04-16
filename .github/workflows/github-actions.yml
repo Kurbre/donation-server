@@ -23,7 +23,7 @@ jobs:
       - name: unit test
         run: yarn test
       - name: Start database
-        run: docker-compose up -d
+        run: docker compose up -d
       - name: Run Prisma migrations
         run: npx prisma migrate deploy
       - name: e2e test
