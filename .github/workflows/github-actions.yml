@@ -16,6 +16,8 @@ jobs:
           cache: 'yarn'
       - name: install modules
         run: yarn
+      - name: generate prisma types
+        run: npx prisma generate
       - name: build project
         run: yarn build
       - name: unit test
