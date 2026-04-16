@@ -1,6 +1,22 @@
 version: '3.9'
 
 services:
+  main:
+    container_name: main
+    build:
+      context: .
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/dist
+    ports:
+      - 3002:3002
+      - 9229:9229
+    depends_on:
+      - db
+    restart: always
   db:
     image: postgres:15 # версия PostgreSQL
     container_name: postgres_db
