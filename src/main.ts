@@ -34,7 +34,8 @@ async function bootstrap() {
 			cookie: {
 				maxAge: 1000 * 60 * 60 * 24 * 3, // 3 дня
 				httpOnly: true, // Защита от XSS
-				secure: config.getOrThrow<boolean>('COOKIE_SECURE') // true только если используете HTTPS
+				secure: Boolean(config.getOrThrow<boolean>('COOKIE_SECURE')),
+				sameSite: config.getOrThrow<boolean>('COOKIE_SAMESITE') // true только если используете HTTPS
 			},
 			store: new pgStore({
 				conString: config.getOrThrow<string>('DATABASE_URL'),
