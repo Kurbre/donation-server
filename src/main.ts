@@ -17,7 +17,7 @@ async function bootstrap() {
 	app.setGlobalPrefix('api')
 
 	app.enableCors({
-		origin: [config.getOrThrow<string>('CLIENT_URL'), 'http://localhost:3000'],
+		origin: config.getOrThrow<string>('CLIENT_URL'),
 		credentials: true
 	})
 
@@ -40,7 +40,7 @@ async function bootstrap() {
 				maxAge: 1000 * 60 * 60 * 24 * 3, // 3 дня
 				httpOnly: true, // Защита от XSS
 				secure: isProd, // Обязательно true на HTTPS
-				sameSite: isProd ? 'none' : 'lax', // sameSite=none требует secure: true
+				sameSite: 'lax', // sameSite=none требует secure: true
 				path: '/' // НЕ устанавливаем domain для кросс-доменных запросов
 			},
 			store: new pgStore({
