@@ -147,7 +147,8 @@ describe('Users service', () => {
 				surname: true,
 				email: true,
 				createdAt: true,
-				updatedAt: true
+				updatedAt: true,
+				avatarPath: true
 			}
 		})
 		await expect(prismaService.user.findUnique).toHaveBeenCalledTimes(1)
