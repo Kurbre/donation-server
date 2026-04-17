@@ -37,11 +37,14 @@ async function bootstrap() {
 			secret: config.getOrThrow<string>('COOKIE_SECRET_KEY'),
 			resave: false, // Не сохранять сессию, если она не менялась
 			saveUninitialized: false, // Не создавать сессию, пока в неё что-то не записали
+			proxy: true, // Для работы с прокси (render.com, nginx)
 			cookie: {
 				maxAge: 1000 * 60 * 60 * 24 * 3, // 3 дня
 				httpOnly: true, // Защита от XSS
 				secure: isProd,
-				sameSite: isProd ? 'none' : 'lax'
+				sameSite: isProd ? 'none' : 'lax',
+				path: '/', // Явно указываем path
+				domain: isProd ? undefined : 'localhost' // URL без path
 			},
 			store: new pgStore({
 				conString: config.getOrThrow<string>('DATABASE_URL'),
