@@ -29,12 +29,6 @@ async function bootstrap() {
 
 	const isProd = config.get<string>('NODE_ENV') === 'production'
 
-	// Извлекаем домен из CLIENT_URL
-	const clientUrl = config.getOrThrow<string>('CLIENT_URL')
-	const clientDomain = new URL(clientUrl).hostname
-
-	console.log(isProd, clientUrl, clientDomain)
-
 	app.use(
 		session({
 			name: config.getOrThrow<string>('COOKIE_NAME'),
@@ -47,8 +41,7 @@ async function bootstrap() {
 				httpOnly: true, // Защита от XSS
 				secure: isProd, // Обязательно true на HTTPS
 				sameSite: isProd ? 'none' : 'lax', // sameSite=none требует secure: true
-				path: '/',
-				domain: clientDomain // Извлечено из CLIENT_URL
+				path: '/' // НЕ устанавливаем domain для кросс-доменных запросов
 			},
 			store: new pgStore({
 				conString: config.getOrThrow<string>('DATABASE_URL'),
