@@ -29,26 +29,31 @@ async function bootstrap() {
 
 	const isProd = config.get<string>('NODE_ENV') === 'production'
 
-	console.log(isProd)
+	// Извлекаем домен из CLIENT_URL
+	const clientUrl = config.getOrThrow<string>('CLIENT_URL')
+	const clientDomain = new URL(clientUrl).hostname
+
+	console.log(isProd, clientUrl, clientDomain)
 
 	app.use(
 		session({
 			name: config.getOrThrow<string>('COOKIE_NAME'),
 			secret: config.getOrThrow<string>('COOKIE_SECRET_KEY'),
 			resave: false, // Не сохранять сессию, если она не менялась
-			saveUninitialized: false, // Не создавать сессию, пока в неё что-то не записали
+			saveUninitialized: true, // Создавать сессию сразу для установки куки
 			proxy: true, // Для работы с прокси (render.com, nginx)
 			cookie: {
 				maxAge: 1000 * 60 * 60 * 24 * 3, // 3 дня
 				httpOnly: true, // Защита от XSS
-				secure: isProd,
-				sameSite: isProd ? 'none' : 'lax',
-				path: '/', // Явно указываем path
-				domain: isProd ? undefined : 'localhost' // URL без path
+				secure: isProd, // Обязательно true на HTTPS
+				sameSite: isProd ? 'none' : 'lax', // sameSite=none требует secure: true
+				path: '/',
+				domain: clientDomain // Извлечено из CLIENT_URL
 			},
 			store: new pgStore({
 				conString: config.getOrThrow<string>('DATABASE_URL'),
-				tableName: 'sessions'
+				tableName: 'sessions',
+				errorLog: console.error
 			})
 		})
 	)
