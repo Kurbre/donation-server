@@ -34,7 +34,7 @@ async function bootstrap() {
 			name: config.getOrThrow<string>('COOKIE_NAME'),
 			secret: config.getOrThrow<string>('COOKIE_SECRET_KEY'),
 			resave: false, // Не сохранять сессию, если она не менялась
-			saveUninitialized: true, // Создавать сессию сразу для установки куки
+			saveUninitialized: false, // Создавать сессию сразу для установки куки
 			proxy: true, // Для работы с прокси (render.com, nginx)
 			cookie: {
 				maxAge: 1000 * 60 * 60 * 24 * 3, // 3 дня
