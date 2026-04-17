@@ -46,7 +46,8 @@ export class UsersService {
 				surname: true,
 				email: true,
 				createdAt: true,
-				updatedAt: true
+				updatedAt: true,
+				avatarPath: true
 			}
 		})
 	}
@@ -69,7 +70,8 @@ export class UsersService {
 				surname: true,
 				email: true,
 				createdAt: true,
-				updatedAt: true
+				updatedAt: true,
+				avatarPath: true
 			}
 		})
 		if (!user) throw new NotFoundException(USERS_ERRORS.NOT_FOUND)

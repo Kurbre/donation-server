@@ -20,6 +20,8 @@ model User {
   email String @unique
   password String
 
+  avatarPath String @default("http://res.cloudinary.com/dwbzak6xg/image/upload/v1776454853/db9ytvlloe4gxawiawax.png")
+
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
