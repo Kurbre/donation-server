@@ -17,7 +17,7 @@ async function bootstrap() {
 	app.setGlobalPrefix('api')
 
 	app.enableCors({
-		origin: config.getOrThrow<string>('CLIENT_URL'),
+		origin: [config.getOrThrow<string>('CLIENT_URL'), 'http://localhost:3000'],
 		credentials: true
 	})
 
