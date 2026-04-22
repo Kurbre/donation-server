@@ -4,5 +4,6 @@ export const mockUser = {
 	surname: 'Surname',
 	email: 'example@gmail.com',
 	createdAt: new Date('2026-04-10T18:44:57.747Z'),
-	updatedAt: new Date('2026-04-10T18:44:57.747Z')
+	updatedAt: new Date('2026-04-10T18:44:57.747Z'),
+	avatarPath: ''
 }

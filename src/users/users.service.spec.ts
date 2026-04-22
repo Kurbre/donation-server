@@ -435,4 +435,37 @@ describe('Users service', () => {
 		})
 		expect(prismaService.token.findUnique).toHaveBeenCalledTimes(1)
 	})
+
+	it('should be updated user', async () => {
+		const data = {
+			name: 'new name',
+			surname: 'new surname'
+		}
+		jest.spyOn(prismaService.user, 'update').mockResolvedValue({
+			...mockUser,
+			...data
+		} as any)
+
+		const res = await service.updateUser(mockUser.id, data)
+
+		expect(prismaService.user.update).toHaveBeenCalledWith({
+			where: { id: mockUser.id },
+			data: data,
+			select: {
+				id: true,
+				avatarPath: true,
+				createdAt: true,
+				email: true,
+				name: true,
+				surname: true,
+				updatedAt: true
+			}
+		})
+		expect(prismaService.user.update).toHaveBeenCalledTimes(1)
+
+		expect(res).toEqual({
+			...mockUser,
+			...data
+		})
+	})
 })

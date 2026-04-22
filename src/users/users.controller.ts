@@ -5,6 +5,7 @@ import {
 	HttpCode,
 	HttpStatus,
 	Param,
+	Patch,
 	Post
 } from '@nestjs/common'
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
@@ -18,6 +19,7 @@ import { SendResetPasswordDto } from './dto/send-reset-password.dto'
 import { UserResponseDto } from './dto/user-response.dto'
 import { UsersService } from './users.service'
 import { USERS_ERRORS } from './constants/users-errors'
+import { UpdateUserDto } from './dto/update-user.dto'
 
 @ApiTags('Users')
 @Controller('users')
@@ -107,5 +109,18 @@ export class UsersController {
 	})
 	getProfile(@GetUser('id') userId: string) {
 		return this.usersService.findById(userId)
+	}
+
+	@Auth()
+	@Patch()
+	@HttpCode(HttpStatus.CREATED)
+	@ApiOperation({ summary: 'Обновить аккаунт' })
+	@ApiResponse({
+		status: HttpStatus.CREATED,
+		description: 'Успешно обновили аккаунт',
+		type: UserResponseDto
+	})
+	updateProfile(@GetUser('id') userId: string, @Body() dto: UpdateUserDto) {
+		return this.usersService.updateUser(userId, dto)
 	}
 }

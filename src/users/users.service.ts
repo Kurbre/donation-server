@@ -13,6 +13,7 @@ import { ResetPassword } from '../utils/templates/resetPassword.type'
 import { USERS_ERRORS } from './constants/users-errors'
 import { CreateUserDto } from './dto/create-user.dto'
 import { ResetPasswordDto } from './dto/reset-password.dto'
+import { UpdateUserDto } from './dto/update-user.dto'
 
 @Injectable()
 export class UsersService {
@@ -188,5 +189,25 @@ export class UsersService {
 		return {
 			message: USERS_ERRORS.SUCCESS_RESET_PASSWORD
 		}
+	}
+
+	async updateUser(userId: string, dto: UpdateUserDto) {
+		await this.findById(userId)
+
+		const user = await this.prismaService.user.update({
+			where: { id: userId },
+			data: dto,
+			select: {
+				id: true,
+				avatarPath: true,
+				createdAt: true,
+				email: true,
+				name: true,
+				surname: true,
+				updatedAt: true
+			}
+		})
+
+		return user
 	}
 }
