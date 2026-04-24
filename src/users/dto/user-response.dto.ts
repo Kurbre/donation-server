@@ -14,6 +14,9 @@ export class UserResponseDto {
 	email: string
 
 	@ApiProperty()
+	avatarPath: string
+
+	@ApiProperty()
 	createdAt: Date
 
 	@ApiProperty()
